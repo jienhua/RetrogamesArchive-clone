@@ -183,7 +183,7 @@ body {
   /*background-repeat: no-repeat;*/
   /*background-position: center center;*/
   /*background-attachment: fixed;*/
-  /*background-size: cover;*/
+  background-size: cover;
   //font-family: PressStartFont;
   font-size:12px;
   height: inherit;

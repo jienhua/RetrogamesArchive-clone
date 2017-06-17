@@ -1,70 +1,51 @@
 import React, { Component } from 'react';
+// import connect from react-redux
+import { connect } from 'react-redux';
+// bindActionCreators comes handy to wrap action creators in dispatch calls
+import { bindActionCreators } from 'redux';
+import Immutable from 'immutable';
 import { Modal, GamesListManager } from '../components';
 
-export default class GamesContainer extends Component {
+// import the action-creators to be binde with bindActionCreators
+import * as gamesActionCreators from '../actions/games';
+
+// we do not export GamesContainer as it is 'almost' a dumb component
+class GamesContainer extends Component {
 	constructor (props) {
-		super(props);
-		// The initial state
-		this.state = { 
-			games: [], 
-			selectedGame: {}, 
-			searchBar: ''
-		};
-		// Bind the functions to this (context)
+		super();
 		this.toggleModal = this.toggleModal.bind(this);
 		this.deleteGame = this.deleteGame.bind(this);
 		this.setSearchBar = this.setSearchBar.bind(this);
 	}
 
-	// Once the component mounted it fetches the data from the server
 	componentDidMount () {
 		this.getGames();
 	}
 
+	// Once the action is dispatched we toggle the modal
 	toggleModal (index) {
-		this.setState({
-			selectedGame: this.state.games[index]
-		});
-		// Since we included bootstrap we can show our modal throught its syntax
+		// We pass the game given the index parameter passed from the view button
+		this.props.gamesActions.showSelectedGame(this.props.games[index]);
 		$('#game-modal').modal();
 	}
 
+	// GET_GAMES is now dispatched and intercepted by the saga watcher
 	getGames () {
-		fetch('http://localhost:8080/games', {
-			headers: new Headers({
-				'Content-Type': 'application/json'
-			})
-		})
-		.then(res => res.json()) // The json response to object literal
-		.then(data => this.setState({ games: data }));
+		this.props.gamesActions.getGames();
 	}
 
 	deleteGame (id) {
-		fetch(`http://localhost:8080/games/${id}`, {
-			headers: new Headers({
-				'Content-Type': 'application/json'
-			}),
-			method: 'DELETE',
-		})
-		.then(res => res.json())
-		.then(res => {
-			// The game is also removed from the state thanks to the filter function
-			this.setState({
-				games: this.state.games.filter(game=> game._id !== id)
-			});
-			console.log(res.message);
-		});
+		console.log('deletegame (gamescontainer): ', id);
+		this.props.gamesActions.deleteGame(id);
 	}
 
 	setSearchBar (event) {
-		// Super still filters super mario thanks to toLowerCase
-		this.setState({
-			searchBar: event.target.value.toLowerCase()
-		});	
+		this.props.gamesActions.setSearchBar(event.target.value.toLowerCase());
 	}
 
 	render () {
-		const { games, selectedGame, searchBar } = this.state;
+		const { games, searchBar, selectedGame } = this.props;
+		console.log(games);
 		return (
 			<div>
 				<Modal game={selectedGame}/>
@@ -78,4 +59,23 @@ export default class GamesContainer extends Component {
 			</div>
 		);
 	}
-} 
+}
+
+// We can read values from the state thanks to mapStateToProps
+function mapStateToProps (state) {
+	return { // We get all the games to list in the page
+		games: state.getIn(['games', 'list'],Immutable.List()).toJS(),
+		searchBar: state.getIn(['games', 'searchBar'], ''), // We retrieve the searchBar content too
+		selectedGame: state.getIn(['games', 'selectedGame'], Immutable.List()).toJS()
+	}
+}
+
+// We can dispatch actions to the reducer and sagas
+function mapDispatchToProps (dispatch) {
+	return {
+		gamesActions: bindActionCreators(gamesActionCreators, dispatch)
+	};
+}
+
+// export the connected GamesContainer
+export default connect(mapStateToProps, mapDispatchToProps)(GamesContainer);

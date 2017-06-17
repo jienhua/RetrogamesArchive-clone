@@ -10,6 +10,7 @@ export default class GamesListManager extends PureComponent {
 				<div className='row text-left'>
 					<Link to='/games/add' className='btn btn-danger'>Add a new Game!</Link>
 				</div>
+				<input type="text" className="form-control" placeholder="Search by name" onChange={(event) => this.props.setSearchBar(event)} />
 				<div className='row'>
 					{
 						// A Game is only shown if its name contains the string from the search Bar
