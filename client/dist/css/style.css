@@ -179,10 +179,10 @@ body {
   height:inherit;
 }
 .main {
-  /*background-image: url('https://cdn.filestackcontent.com/3gIKCiduR5vPM0pF9jDe');*/
-  /*background-repeat: no-repeat;*/
-  /*background-position: center center;*/
-  /*background-attachment: fixed;*/
+  background-image: url('https://cdn.filestackcontent.com/3gIKCiduR5vPM0pF9jDe');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-attachment: fixed;
   background-size: cover;
   //font-family: PressStartFont;
   font-size:12px;

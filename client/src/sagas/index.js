@@ -1,13 +1,18 @@
 // import the watcher we have just created
 import {
 	watchGetGames,
-	watchDeleteGame
+	watchDeleteGame,
+	watchPostGame
 } from './games';
+
+import { watchUploadPicture } from './filestack';
 
 export default function* rootSaga () {
 	// We start all the sagas in parallel
 	yield [
 		watchGetGames(),
-		watchDeleteGame()
+		watchDeleteGame(),
+		watchPostGame(),
+		watchUploadPicture() // Run the last saga paralled with the others
 	];
 }
