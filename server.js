@@ -4,8 +4,10 @@ import mongoose from 'mongoose';
 import morgan from 'morgan';
 
 // we gotta import our models and routes
-import Game from './app/models/game';
+// import Game from './app/models/game';
 import { getGames, getGame, postGame, deleteGame } from './app/routes/games';
+// New routes and middleware to manage the authentication
+import { signup, login, verifyAuth } from './app/routes/user';
 
 const app = express(); // out express server!
 const port = process.env.PORT || 8080;
@@ -39,20 +41,26 @@ app.use((req, res, next) => {
 	next();
 });
 
+// New routes to handle Authentication
+app.post('/auth/login', login);
+app.post('/auth/signup', signup);
+
 // API routes
 app.route('/games')
 	// create a game
-	.post(postGame)
+	// verifyAuth is the security middleware to check the authentication
+	.post(verifyAuth, postGame)
 	// get all the games
 	.get(getGames);
 app.route('/games/:id')
 	// get a single game
 	.get(getGame)
 	// delete a single game
-	.delete(deleteGame);
+	// Again delete requests pass through the security middleware
+	.delete(verifyAuth, deleteGame);
 
 // ...For all the other requests just sends back the Homepage
-app.route('*').get((req, res) =>{
+app.route('*').get((req, res) => {
 	res.sendFile('client/dist/index.html', { root: __dirname });
 });
 

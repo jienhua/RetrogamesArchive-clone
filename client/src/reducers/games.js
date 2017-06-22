@@ -3,6 +3,7 @@ import Immutable from 'immutable';
 import {
 	GET_GAMES_SUCCESS,
 	GET_GAMES_FAILURE,
+	
 	SET_SEARCH_BAR,
 	SHOW_SELECTED_GAME,
 	DELETE_GAME_SUCCESS,

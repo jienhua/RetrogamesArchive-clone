@@ -7,12 +7,16 @@ import {
 
 import { watchUploadPicture } from './filestack';
 
+import { watchLoginUser, watchSignupUser } from './auth';
+
 export default function* rootSaga () {
 	// We start all the sagas in parallel
 	yield [
 		watchGetGames(),
 		watchDeleteGame(),
 		watchPostGame(),
-		watchUploadPicture() // Run the last saga paralled with the others
+		watchUploadPicture(), // Run the last saga paralled with the others
+		watchLoginUser(),
+		watchSignupUser()
 	];
 }

@@ -8,6 +8,8 @@ import GamesListManager from './GamesListManager';
 import Archive from './Archive';
 import Modal from './Modal';
 
+import Login from './Login';
+import Signup from './Signup';
 // we export all the components once
 export { 
 	About, 
@@ -18,5 +20,7 @@ export {
 	Game,
 	GamesListManager,
 	Archive,
-	Modal
+	Modal,
+	Login,
+	Signup
 };

@@ -1,0 +1,120 @@
+import { takeLatest } from 'redux-saga';
+import { put, call, select } from 'redux-saga/effects';
+// import the constant
+import { LOGIN_USER } from '../constants/auth';
+import {
+	loginUserSuccess,
+	loginUserFailure,
+
+	signupUserSuccess,
+	signupUserFailure
+} from '../actions/auth';
+
+// push action-creators to change the view
+import { push } from 'react-router-redux';
+// we want to show a notification to the user once logged in
+import { actions as toastrActions } from 'react-redux-toastr';
+
+// Selector to get the credential from the form
+const getForm = (state, form) => {
+	return state.getIn(['form', form]).toJS();
+}
+
+// Fetch send the credentials to the server
+const sendCredentials = (route, credentials) => {
+	return fetch(`http://localhost:8080/auth/${route}`, {
+		headers: new Headers({
+			'Content-Type': 'application/json'
+		}),
+		method: 'POST',
+		body: JSON.stringify(credentials)
+	})
+	.then(response => {
+		if (response.status === 200) {
+			return response.json(); // this contains the token!
+		}
+		throw response;
+	});
+};
+
+function* loginUser (action) {
+	// The redirection changes the view to the main page
+	const { redirection } = action;
+	try {
+		const credentials = yield select(getForm, 'login');
+		const result = yield call(sendCredentials, 'login', credentials.values);
+		// Redux-toastr shows the users nice notifications
+		yield put(toastrActions.add({
+			type: 'success', // success is a green notification
+			title: 'Retrogames Archive',
+			message: result.message
+		}));
+		// We also save the token in the local storage
+		localStorage.setItem('token', result.token);
+		// We send the token to the reducer
+		yield put(loginUserSuccess(result.token));
+		// Redirect to the main page!
+		yield put(push(redirection));
+	} catch (e) {
+		// The status 401 has a personalized message to show in a notification
+		let message = '';
+		if(e.status === 401) {
+			message = 'Invalid email/password';
+		} else {
+			message = 'Sorry, an error occured!';
+		}
+		// Set the state to initial state
+		yield put(loginUserFailure());
+		yield put(toastrActions.add({
+			type: 'error', // Red notification
+			title: 'Retrogames Archive',
+			message: message
+		}));
+	}
+}
+
+// sagas to handle signup
+function* signupUser () {
+	try {
+		// get the credentials from the form in the state
+		const credentials = yield select(getForm, 'signup');
+		const result = yield call(sendCredentials, 'signup', credentials.values);
+		// show a notification in the browser
+		yield put(toastrActions.add({
+			type: 'success',
+			title: 'Retrogames Archive',
+			message: result.message
+		}));
+		// Set the token in the local storage
+		localStorage.setItem('token', result.token);
+		// update the state with the token
+		yield put(signupUserSuccess(result.token));
+		// Redirect to /games
+		yield put(push('/games'));
+	} catch (e) {
+		// As we did for loginUser, we show a personalized message according to the error status
+		let message = '';
+		if (e.status === 409) {
+			message = 'Email is already taken';
+		} else {
+			message = 'Sorry, an error occured!';
+		}
+		// Set the auth portion of the state to the initial value
+		yield put(signupUserFailure());
+		yield put(toastrActions.add({
+			type: 'error',
+			title: 'Retrogames Archive',
+			message: message
+		}));
+	}
+}
+
+// Saga watcher to intercept LOGIN_USER
+export function* watchLoginUser () {
+	yield takeLatest(LOGIN_USER, loginUser);
+}
+
+// signup watcher
+export function* watchSignupUser () {
+	yield takeLatest(SIGNUP_USER, signupUser);
+}
