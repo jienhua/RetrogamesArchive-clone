@@ -6,7 +6,9 @@ import {
 	LOGIN_USER_FAILURE,
 
 	SIGNUP_USER_SUCCESS,
-	SIGNUP_USER_FAILURE
+	SIGNUP_USER_FAILURE,
+
+	LOGOUT_USER
 } from '../constants/auth';
 
 // The initial state has no token hence no name and isAuthenticated is false
@@ -27,6 +29,7 @@ export default (state = initialState, action) => {
 				name: jwtDecode(action.token).sub
 			});
 		}
+		case LOGOUT_USER:
 		case SIGNUP_USER_FAILURE:
 		// In case of failure the state goes back to the initial one
 		case LOGIN_USER_FAILURE: 

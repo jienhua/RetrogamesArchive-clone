@@ -6,7 +6,9 @@ import {
 
 	SIGNUP_USER,
 	SIGNUP_USER_SUCCESS,
-	SIGNUP_USER_FAILURE
+	SIGNUP_USER_FAILURE,
+
+	LOGOUT_USER
 } from '../constants/auth';
 
 // intercepted by a redux-saga
@@ -29,6 +31,13 @@ function loginUserSuccess (token) { // it carries the token!
 function loginUserFailure () {
 	return {
 		type: LOGIN_USER_FAILURE
+	};
+}
+
+// the action-creator
+function logoutUser () {
+	return {
+		type: LOGOUT_USER
 	};
 }
 
@@ -58,5 +67,7 @@ export {
 
 	signupUser,
 	signupUserSuccess,
-	signupUserFailure
+	signupUserFailure,
+
+	logoutUser
 };

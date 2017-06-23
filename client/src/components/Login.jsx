@@ -44,7 +44,7 @@ class Login extends PureComponent {
 										component='textarea'
 										className='form-control'
 										placeholder='Enter the password'
-										row='5'
+										rows='5'
 									/>
 								</div>
 								<button
